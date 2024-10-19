@@ -17,13 +17,23 @@ history:
 10-04-2024  In create_selection_row(), parameter defaults to None.
             Add opt_fxn as an optional function from the calling module.
 10-16-2024  Committed to GitHub repository ui_RF.
+10-18-2024  Add function attributes to 'this'. Add second optional
+            function to pass to UI code: opt_fxn.
+10-19-2024  Add flag check 'use_pandas' for use of pandas library.
+"""
+"""
+TODO - 
 """
 import tkinter as tk
 from tkinter import ttk
 import sys
-# new note
-this = sys.modules['__main__']
 
+this = sys.modules['__main__']
+this.my_fxn = None
+this.opt_fxn = None
+
+# Expect True if UI should be limited to # of pandas data columns.
+this.use_pandas = False
 this.do_debug = False
 
 def create_selection_row(windows: dict = None) -> object:
@@ -33,7 +43,6 @@ def create_selection_row(windows: dict = None) -> object:
         main_list_fr
         data_columns
     """
-    # print(f'in multi_select/create_slection_row, data_columns is:\n{this.data_columns}')
     nextrowframe = ttk.Frame(this.main_list_fr, border=2)
 
     var = tk.StringVar()
@@ -50,14 +59,14 @@ def create_selection_row(windows: dict = None) -> object:
                              text='-',
                              width=1,
                              command=lambda rf=nextrowframe,
-                                            w={}: remove_selection_row(rf, w))
+                                            w=windows: remove_selection_row(rf, w))
     button_subt.bind('-', lambda ev, rf=nextrowframe,
                                  w={}: remove_selection_row(rf, w, ev))
 
     button_add = ttk.Button(nextrowframe,
                             text='+',
                             width=1,
-                            command=lambda w={}: add_selection_row(w))
+                            command=lambda w=windows: add_selection_row(w))
     button_add.bind('<Return>', add_selection_row)
     
     filt_cb.grid(row=0, column=0)
@@ -77,9 +86,12 @@ def add_selection_row(windows: dict) -> None:
     rows_gridded = [r for r in this.item_rows if len(r.grid_info().items()) > 0]
     num_gridded = len(rows_gridded)
 
-    # relevant if using a pandas dataset
-    # if num_gridded == len(this.data_columns):
-    #     return
+    # new:
+    if this.data_columns is not None:
+        print('checking num_gridded vs data_columns')
+        if this.use_pandas is True:
+            if num_gridded == len(this.data_columns):
+                return
 
     newrow = create_selection_row(windows)
     this.item_rows.append(newrow)
@@ -101,7 +113,6 @@ def add_selection_row(windows: dict) -> None:
 
 
 def remove_selection_row(rowframe: object, windows: dict, ev=None) -> None:
-# def remove_selection_row2(ev, rowframe: object, windows: dict) -> None:
     """Remove a row of widgets specifying a selection-from-list.
     
     Data is automatically re-filtered by the remaining criteria.
