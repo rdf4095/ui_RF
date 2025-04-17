@@ -12,9 +12,10 @@ history:
 -------
 09-21-2024  creation
 10-16-2024  Committed to GitHub repository ui_RF.
+04-17-2025  Add create_spinbox(). Modify some lambdas to same format as
+            custom classes in other modules.
 """
 """
-TODO: - Where should the Methods part of the docstring go?
 """
 
 import tkinter as tk
@@ -86,6 +87,7 @@ class ToolFrame(ttk.Frame):
         # self.label_name = self.display_name.title() + self.sep
 
         self.create_widgets()
+        self.grid(row=self.posn[0], column=self.posn[1], padx=5, pady=10, sticky=self.stick)
 
     def create_widgets(self):
         # self.lab = ttk.Label(self,
@@ -110,9 +112,10 @@ class ToolFrame(ttk.Frame):
         button_subt = ttk.Button(self,
                                 text='-',
                                 width=1,
-                                command=lambda rf=self,
-                                               remove_selection_row(rf))
-                                #  command=lambda: remove_cb_textvar_row(nextrowframe, windows))
+                                # command=lambda rf=self:
+                                #                remove_selection_row(rf))
+                                 command=lambda rf=self,
+                                                w=windows: remove_selection_row(rf, w))
 
         button_add = ttk.Button(nextrowframe,
                                 text='+',
@@ -124,5 +127,16 @@ class ToolFrame(ttk.Frame):
         self.lab.pack(side='left')#, fill='x')
         self.cb.pack(side='left')#, fill='x')
 
-        self.grid(row=self.posn[0], column=self.posn[1], padx=5, pady=10, sticky=self.stick)
+        # self.grid(row=self.posn[0], column=self.posn[1], padx=5, pady=10, sticky=self.stick)
 
+    def create_spinbox(self):
+        sb = ttk.Spinbox(self,
+                         width=3,
+                         from_=1,
+                         to=10,
+                         values=self.cb_values,
+                         wrap=True,
+                         textvariable=self.var,
+                         command=self.callb
+        )
+        return sb

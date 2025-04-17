@@ -22,7 +22,8 @@ history:
 10-19-2024  Add flag check 'use_pandas' for use of pandas library.
 11-02-2024  Pass explicit arguments through create_selection_row to
             add_selection_row. Adjust the two function docstrings to reflect
-            that we don't depend on finding values in the importing module.            
+            that we don't depend on finding values in the importing module.
+04-09-2025  Correct the parameter list for create_selection_row().
 """
 """
 TODO - 
@@ -31,21 +32,24 @@ import tkinter as tk
 from tkinter import ttk
 import sys
 
+# for documentation and debug ----------
 this = sys.modules['__main__']
 this.my_fxn = None
 this.opt_fxn = None
 
-# Expect True if UI should be limited to # of pandas data columns.
+# Expect True if the UI that is built should be limited to the number of
+# data columns in a pandas dataset.
 this.use_pandas = False
 
 do_debug = False
+# ---------- END doc and debug
 
-# def create_selection_row(windows: dict = None) -> object:
-def create_selection_row(main_list_fr: ttk.Frame,
+
+def create_selection_row(list_frame: ttk.Frame,
                          data_columns: list,
                          windows: dict = None) -> object:
     """Add a new row of widgets for making a selection-from-list."""
-    nextrowframe = ttk.Frame(main_list_fr, border=2)
+    nextrowframe = ttk.Frame(list_frame, border=5)
 
     var = tk.StringVar()
     filt_cb = ttk.Combobox(nextrowframe, height=3, width=7,
@@ -70,11 +74,11 @@ def create_selection_row(main_list_fr: ttk.Frame,
                             text='+',
                             width=1,
                             command=lambda ev=None,
-                                           ml=main_list_fr,
+                                           ml=list_frame,
                                            dc=data_columns,
                                            w=windows: add_selection_row(ev, ml, dc, w))
     button_add.bind('<Return>', lambda ev,
-                                       ml=main_list_fr,
+                                       ml=list_frame,
                                        dc=data_columns,
                                        w=windows: add_selection_row(ev, ml, dc, w))
     
@@ -120,11 +124,13 @@ def add_selection_row(event,
         print()
 
 
-def remove_selection_row(rowframe: object, windows: dict, ev=None) -> None:
+def remove_selection_row(rowframe: object,
+                         windows: dict,
+                         ev=None) -> None:
     """Remove a row of widgets specifying a selection-from-list.
     
-    Data is automatically re-filtered by the remaining criteria.
-    uses variables from the calling module:
+    Data is automatically re-filtered by the remaining criteria. (in pandas_data_RF)
+    Uses variables from the calling module:
         item_rows
         data_1: passed to my_fxn
     """
